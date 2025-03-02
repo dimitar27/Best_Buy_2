@@ -33,10 +33,11 @@ def start(store_object):
             shopping_list = []
             product_mapping = {}
 
-            print("\nAvailable Products:")
+            print("------")
             for index, product in enumerate(store_object.get_all_products(), start=1):
                 print(f"{index}. {product.show()}")
                 product_mapping[index] = product
+            print("------")
 
             print("\nWhen you want to finish order, enter empty text.")
 
