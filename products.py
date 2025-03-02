@@ -2,6 +2,7 @@ class Product:
     """Represents a product with a name, price, quantity, and active status."""
 
     def __init__(self, name, price, quantity):
+        """Initializes a Product instance."""
 
         if not isinstance(name, str) or not name.strip():
             raise ValueError("Product name is required and cannot be blank.")
@@ -69,6 +70,7 @@ class Product:
 
 
 def main():
+
 
     bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
     mac = Product("MacBook Air M2", price=1450, quantity=100)
