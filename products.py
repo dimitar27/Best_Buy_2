@@ -69,25 +69,47 @@ class Product:
         return total_price
 
 
-def main():
+class NonStockedProduct(Product):
+    """Represents a product that does not track quantity."""
+
+    def __init__(self, name, price):
+        """Initializes a non-stocked product with a fixed price and no quantity tracking."""
+        super().__init__(name, price, quantity=1)
+        self.quantity = 0
+
+    def show(self):
+        """Returns the product with unlimited quantity."""
+        return f"{self.name}, Price: {self.price} (unlimited quantity)"
+
+    def is_active(self):
+        """Always returns True, since non-stocked products are always available."""
+        return True
+
+    def buy(self, quantity):
+        """Calculates the total price for the given quantity."""
+        return self.price * quantity
 
 
-    bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
-    mac = Product("MacBook Air M2", price=1450, quantity=100)
+class LimitedProduct(Product):
+    """Represents a product that has a purchase limit per order."""
 
-    print(bose.buy(50))
-    print(mac.buy(100))
-    print(mac.is_active())
+    def __init__(self, name, price, quantity, maximum):
+        """Initializes a limited product with a maximum purchase restriction."""
+        super().__init__(name, price, quantity)
+        if not isinstance(maximum, int) or maximum <= 0:
+            raise ValueError("Maximum purchase limit must be a positive integer.")
+        self.maximum = maximum
 
-    bose.show()
-    mac.show()
+    def buy(self, quantity) -> float:
+        """Ensures that the purchase does not exceed the maximum limit."""
+        if quantity > self.maximum:
+            raise ValueError(f"Cannot purchase more than {self.maximum} per order.")
+        return super().buy(quantity)
 
-    bose.set_quantity(1000)
-    bose.show()
+    def show(self) -> str:
+        """Returns a string containing the product details."""
+        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity} (Max {self.maximum} per order)"
 
-
-if __name__ == "__main__":
-    main()
 
 
 
