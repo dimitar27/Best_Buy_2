@@ -17,6 +17,7 @@ class Product:
         self.price = float(price)
         self.quantity = quantity
         self.active = True
+        self.promotion = None
 
     def get_quantity(self) -> int:
         """Getter function for quantity.
@@ -25,13 +26,17 @@ class Product:
 
     def set_quantity(self, quantity: int):
         """Setter function for quantity. If quantity reaches 0, deactivates the product."""
-        if not isinstance(quantity, int) or quantity < 0:
-            raise ValueError("Quantity must be a non-negative whole number")
-
         self.quantity -= quantity
-
         if self.quantity == 0:
-            self.active = False
+            self.deactivate()
+
+    def get_promotion(self):
+        """Returns the current promotion applied to the product."""
+        return self.promotion
+
+    def set_promotion(self, promotion):
+        """Assigns a promotion to the product."""
+        self.promotion = promotion
 
     def is_active(self) -> bool:
         """Getter function for active.
@@ -55,17 +60,16 @@ class Product:
         Returns the total price (float) of the purchase.
         Updates the quantity of the product.
         In case of a problem, raises an Exception"""
-        if not isinstance(quantity, int) or quantity <= 0:
-            raise ValueError("Please enter a whole number greater than zero.")
 
         if quantity > self.quantity:
             raise ValueError("Not enough stock available.")
 
-        total_price = self.price * quantity
-        self.quantity -= quantity
-        if self.quantity == 0:
-            self.active = False
+        if self.promotion:
+            total_price = self.promotion.apply_promotion(self, quantity)
+        else:
+            total_price = self.price * quantity
 
+        self.set_quantity(quantity)
         return total_price
 
 
@@ -79,9 +83,14 @@ class NonStockedProduct(Product):
 
     def show(self):
         """Returns the product with unlimited quantity."""
-        return f"{self.name}, Price: {self.price} (unlimited quantity)"
+        if self.promotion:
+            promo_text = f" - Promotion: {self.promotion.name}"
+        else:
+            promo_text = ""
 
-    def is_active(self):
+        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}{promo_text}"
+
+    def is_active(self) -> bool:
         """Always returns True, since non-stocked products are always available."""
         return True
 
@@ -100,15 +109,17 @@ class LimitedProduct(Product):
             raise ValueError("Maximum purchase limit must be a positive integer.")
         self.maximum = maximum
 
+    def show(self) -> str:
+        """Returns a string containing the product details."""
+        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity} (Max {self.maximum} per order)"
+
     def buy(self, quantity) -> float:
         """Ensures that the purchase does not exceed the maximum limit."""
         if quantity > self.maximum:
             raise ValueError(f"Cannot purchase more than {self.maximum} per order.")
         return super().buy(quantity)
 
-    def show(self) -> str:
-        """Returns a string containing the product details."""
-        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity} (Max {self.maximum} per order)"
+
 
 
 
